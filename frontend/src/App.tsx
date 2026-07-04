@@ -22,15 +22,49 @@ interface PRDetail extends PullRequest {
 }
 
 function RiskBadge({ score }: { score: number }) {
-  const color =
-    score <= 3 ? "bg-green-100 text-green-800" :
-    score <= 6 ? "bg-yellow-100 text-yellow-800" :
-    "bg-red-100 text-red-800"
+  const bg =
+    score <= 3 ? "#dcfce7" :
+    score <= 6 ? "#fef9c3" :
+    "#fee2e2"
+  const text =
+    score <= 3 ? "#15803d" :
+    score <= 6 ? "#a16207" :
+    "#b91c1c"
+  const label =
+    score <= 3 ? "Low Risk" :
+    score <= 6 ? "Medium Risk" :
+    "High Risk"
 
   return (
-    <span className={`px-2 py-1 rounded text-sm font-semibold ${color}`}>
-      Risk: {score}/10
+    <span style={{
+      backgroundColor: bg,
+      color: text,
+      padding: "4px 12px",
+      borderRadius: 20,
+      fontSize: 13,
+      fontWeight: 700,
+      letterSpacing: 0.3
+    }}>
+      {label} · {score}/10
     </span>
+  )
+}
+
+function Section({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{
+      backgroundColor: "#f8faff",
+      borderRadius: 8,
+      padding: "12px 16px",
+      marginBottom: 10,
+      borderLeft: "3px solid #60a5fa"
+    }}>
+      <p style={{
+        fontSize: 11, fontWeight: 700, color: "#3b82f6",
+        margin: "0 0 4px", textTransform: "uppercase", letterSpacing: 1
+      }}>{label}</p>
+      <p style={{ fontSize: 14, color: "#1e293b", margin: 0, lineHeight: 1.6 }}>{value}</p>
+    </div>
   )
 }
 
@@ -38,85 +72,165 @@ export default function App() {
   const [prs, setPrs] = useState<PullRequest[]>([])
   const [selected, setSelected] = useState<PRDetail | null>(null)
   const [loading, setLoading] = useState(true)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
 
   useEffect(() => {
     fetch("/api/prs")
       .then(res => res.json())
-      .then(data => {
-        setPrs(data)
-        setLoading(false)
-      })
+      .then(data => { setPrs(data); setLoading(false) })
   }, [])
 
   function openPR(id: number) {
+    setSelectedId(id)
     fetch(`/api/prs/${id}`)
       .then(res => res.json())
       .then(data => setSelected(data))
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
-        PR Risk Assistant
-      </h1>
+    <div style={{ minHeight: "100vh", backgroundColor: "#f0f6ff", fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
 
-      <div className="flex gap-6">
+      {/* Header */}
+      <div style={{
+      background: "linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)",        padding: "28px 40px",
+        textAlign: "center",
+        boxShadow: "0 4px 20px rgba(59,130,246,0.15)"
+      }}>
+        <h1 style={{
+          margin: 0, fontSize: 24, fontWeight: 700,
+          color: "white", letterSpacing: 0.5
+        }}>
+          🔍 PR Risk Assistant
+        </h1>
+        <p style={{ margin: "6px 0 0", fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
+          AI-powered code review for every pull request
+        </p>
+      </div>
+
+      {/* Main Content */}
+      <div style={{
+        display: "flex", gap: 20, padding: "28px 40px",
+        maxWidth: 1200, margin: "0 auto"
+      }}>
+
         {/* PR List */}
-        <div className="w-1/2 space-y-3">
-          <h2 className="text-lg font-semibold text-gray-600">Pull Requests</h2>
-          {loading && <p className="text-gray-400">Loading...</p>}
+        <div style={{ width: "45%" }}>
+          <div style={{
+            display: "flex", justifyContent: "space-between",
+            alignItems: "center", marginBottom: 14
+          }}>
+            <h2 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#334155" }}>
+              Pull Requests
+            </h2>
+            <span style={{
+              backgroundColor: "#dbeafe", color: "#1d4ed8",
+              padding: "2px 10px", borderRadius: 12,
+              fontSize: 12, fontWeight: 600
+            }}>
+              {prs.length} total
+            </span>
+          </div>
+
+          {loading && (
+            <div style={{ textAlign: "center", padding: 40, color: "#94a3b8" }}>
+              Loading pull requests...
+            </div>
+          )}
+
           {prs.map(pr => (
             <div
               key={pr.id}
               onClick={() => openPR(pr.id)}
-              className="bg-white rounded-lg p-4 shadow cursor-pointer hover:shadow-md transition"
+              style={{
+                backgroundColor: selectedId === pr.id ? "#eff6ff" : "white",
+                borderRadius: 10,
+                padding: "14px 16px",
+                marginBottom: 10,
+                cursor: "pointer",
+                boxShadow: selectedId === pr.id
+                  ? "0 0 0 2px #3b82f6, 0 2px 8px rgba(0,0,0,0.06)"
+                  : "0 1px 4px rgba(0,0,0,0.07)",
+                borderLeft: `4px solid ${selectedId === pr.id ? "#3b82f6" : "#e2e8f0"}`,
+                transition: "all 0.15s ease"
+              }}
             >
-              <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-medium text-gray-800">#{pr.pr_number} {pr.title}</p>
-                  <p className="text-sm text-gray-500">by {pr.author}</p>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: "0 0 4px", fontWeight: 600, fontSize: 14, color: "#0f172a" }}>
+                    <span style={{ color: "#3b82f6" }}>#{pr.pr_number}</span> {pr.title}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>
+                    by {pr.author} · {new Date(pr.created_at).toLocaleDateString()}
+                  </p>
                 </div>
-                <span className="text-xs text-gray-400">{pr.status}</span>
+                <span style={{
+                  fontSize: 11, fontWeight: 600,
+                  backgroundColor: pr.status === "open" ? "#dcfce7" : "#f1f5f9",
+                  color: pr.status === "open" ? "#15803d" : "#64748b",
+                  padding: "2px 8px", borderRadius: 10,
+                  marginLeft: 8, whiteSpace: "nowrap"
+                }}>
+                  {pr.status}
+                </span>
               </div>
             </div>
           ))}
         </div>
 
-        {/* PR Detail */}
-        <div className="w-1/2">
-          <h2 className="text-lg font-semibold text-gray-600">Review Detail</h2>
+        {/* Review Detail */}
+        <div style={{ width: "55%" }}>
+          <h2 style={{ margin: "0 0 14px", fontSize: 15, fontWeight: 700, color: "#334155" }}>
+            Review Detail
+          </h2>
+
           {!selected && (
-            <p className="text-gray-400 mt-4">Click a PR to see its review</p>
+            <div style={{
+              backgroundColor: "white", borderRadius: 10, padding: 40,
+              textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.07)"
+            }}>
+              <p style={{ color: "#94a3b8", margin: 0, fontSize: 14 }}>
+                Select a pull request to see its AI review
+              </p>
+            </div>
           )}
+
           {selected && (
-            <div className="bg-white rounded-lg p-6 shadow space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="font-bold text-gray-800">#{selected.pr_number} {selected.title}</h3>
+            <div style={{
+              backgroundColor: "white", borderRadius: 10,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.07)", overflow: "hidden"
+            }}>
+              {/* Detail Header */}
+              <div style={{
+                background: "linear-gradient(135deg, #3b82f6, #93c5fd)",
+                padding: "16px 20px",
+                display: "flex", justifyContent: "space-between", alignItems: "center"
+              }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.8)" }}>
+                    PR #{selected.pr_number}
+                  </p>
+                  <p style={{ margin: "2px 0 0", fontSize: 15, fontWeight: 700, color: "white" }}>
+                    {selected.title}
+                  </p>
+                </div>
                 {selected.review && <RiskBadge score={selected.review.risk_score} />}
               </div>
 
-              {selected.review ? (
-                <>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Summary</p>
-                    <p className="text-gray-700">{selected.review.summary}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Bugs</p>
-                    <p className="text-gray-700">{selected.review.bugs ?? "None found"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Security Issues</p>
-                    <p className="text-gray-700">{selected.review.security_issues ?? "None found"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-gray-600">Test Gaps</p>
-                    <p className="text-gray-700">{selected.review.test_gaps ?? "None found"}</p>
-                  </div>
-                </>
-              ) : (
-                <p className="text-gray-400">No review available for this PR</p>
-              )}
+              {/* Detail Body */}
+              <div style={{ padding: 20 }}>
+                {selected.review ? (
+                  <>
+                    <Section label="Summary" value={selected.review.summary} />
+                    <Section label="Bugs Found" value={selected.review.bugs ?? "✅ No bugs found"} />
+                    <Section label="Security Issues" value={selected.review.security_issues ?? "✅ No security issues"} />
+                    <Section label="Test Gaps" value={selected.review.test_gaps ?? "✅ No test gaps identified"} />
+                  </>
+                ) : (
+                  <p style={{ color: "#94a3b8", textAlign: "center", padding: 20 }}>
+                    No review available for this PR
+                  </p>
+                )}
+              </div>
             </div>
           )}
         </div>
