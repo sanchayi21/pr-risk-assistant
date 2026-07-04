@@ -21,12 +21,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://pr-risk-assistant-bv8pm1u5b-sanchayi.vercel.app"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 @app.get("/")
 def read_root():
     return {"message": "PR Risk Assistant backend is alive"}
