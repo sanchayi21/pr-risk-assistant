@@ -112,17 +112,7 @@ ngrok http 8000
 
 ## Author
 
-Sanchayi Sharma — [GitHub](https://github.com/sanchayi21) · [LinkedIn](your-linkedin-url)
+Sanchayi Sharma — [GitHub](https://github.com/sanchayi21) · [LinkedIn](https://www.linkedin.com/in/sanchayi21/)
 ```
 
 
-Replace `your-linkedin-url` with your actual LinkedIn. Add a screenshot of the dashboard to the repo and reference it in the Screenshots section.
-
-Push it:
-
-```bash
-# save as README.md in root of pr-risk-assistant folder
-git add .
-git commit -m "docs: add README"
-git push origin master
-```
