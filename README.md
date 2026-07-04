@@ -113,6 +113,4 @@ ngrok http 8000
 ## Author
 
 Sanchayi Sharma — [GitHub](https://github.com/sanchayi21) · [LinkedIn](https://www.linkedin.com/in/sanchayi21/)
-```
-
 
