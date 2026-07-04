@@ -75,14 +75,14 @@ export default function App() {
   const [selectedId, setSelectedId] = useState<number | null>(null)
 
   useEffect(() => {
-    fetch("/api/prs")
+    fetch("https://pr-risk-assistant.onrender.com/prs")
       .then(res => res.json())
       .then(data => { setPrs(data); setLoading(false) })
   }, [])
 
   function openPR(id: number) {
     setSelectedId(id)
-    fetch(`/api/prs/${id}`)
+    fetch(`https://pr-risk-assistant.onrender.com/prs/${id}`)
       .then(res => res.json())
       .then(data => setSelected(data))
   }
